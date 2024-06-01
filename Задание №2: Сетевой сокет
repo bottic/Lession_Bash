@@ -1,0 +1,38 @@
+Сервер:
+import socket
+
+def start_server(host, port):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((host, port))
+    server_socket.listen(1)
+    
+    print("Сервер запущен, ожидаем соединения...")
+    
+    while True:
+        conn, addr = server_socket.accept()
+        data = conn.recv(1024)
+        print(f"Получено название сокета от {addr}: {data.decode()}")
+        conn.close()
+
+if __name__ == "__main__":
+    host = "127.0.0.1"
+    port = 65432
+    start_server(host, port)
+Клиент:
+import socket
+
+def send_socket_name(host, port, socket_name):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
+    client_socket.sendall(socket_name.encode())
+    client_socket.close()
+
+if __name__ == "__main__":
+    host = "127.0.0.1"
+    port = 65432
+    socket_name = input("Введите название сокета: ")
+    send_socket_name(host, port, socket_name)
+Запуск программы
+Запустите сервер: python network_socket_server.py
+Запустите клиента: python network_socket_client.py
+Введите название сокета в клиенте.

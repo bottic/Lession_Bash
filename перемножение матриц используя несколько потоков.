@@ -1,0 +1,56 @@
+import numpy as np
+import threading
+
+def matrix_multiply_worker(A, B, result, start_row, end_row):
+    """
+    Функция для перемножения части матрицы A на матрицу B и сохранения результата в result.
+    """
+    for i in range(start_row, end_row):
+        for j in range(B.shape[1]):
+            result[i][j] = sum(A[i][k] * B[k][j] for k in range(B.shape[0]))
+
+def parallel_matrix_multiply(A, B, num_threads):
+    """
+    Функция для параллельного перемножения матриц с использованием нескольких потоков.
+    """
+    n, m = A.shape
+    m2, p = B.shape
+    if m != m2:
+        raise ValueError("Количество столбцов A должно быть равно количеству строк B")
+    
+    result = np.zeros((n, p))
+
+    # Определяем диапазон строк для каждого потока
+    rows_per_thread = n // num_threads
+    threads = []
+
+    for i in range(num_threads):
+        start_row = i * rows_per_thread
+        if i == num_threads - 1:
+            end_row = n
+        else:
+            end_row = (i + 1) * rows_per_thread
+
+        thread = threading.Thread(target=matrix_multiply_worker, args=(A, B, result, start_row, end_row))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    return result
+
+# Пример использования
+if __name__ == "__main__":
+    A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    B = np.array([[9, 8, 7], [6, 5, 4], [3, 2, 1]])
+
+    num_threads = 3
+    result = parallel_matrix_multiply(A, B, num_threads)
+
+    print("Матрица A:")
+    print(A)
+    print("Матрица B:")
+    print(B)
+    print("Результат перемножения A и B:")
+    print(result)

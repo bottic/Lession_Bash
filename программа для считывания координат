@@ -1,0 +1,40 @@
+def is_within_square(latitude, longitude):
+    """
+    Проверяет, находятся ли координаты в пределах заданного квадрата.
+    
+    Широта: от 50 до 80
+    Долгота: от 20 до 45
+    """
+    return 50 <= latitude <= 80 and 20 <= longitude <= 45
+
+def filter_coordinates(coordinates):
+    """
+    Фильтрует координаты, оставляя только те, которые находятся в пределах заданного квадрата.
+    """
+    filtered = []
+    for coord in coordinates:
+        latitude, longitude = coord
+        if is_within_square(latitude, longitude):
+            filtered.append(coord)
+    return filtered
+
+# Набор координат
+coordinates = [
+    (54.847830, 83.094392),
+    (80.765433, 10.588200),
+    (81.235467, 85.000563),
+    (10.010101, 20.094850),
+    (12.765456, 40.046526),
+    (50.653546, 45.034536),
+    (49.345666, 46.043566),
+    (45.345673, 33.011111),
+    (32.000001, 11.023456)
+]
+
+# Фильтрация координат
+filtered_coordinates = filter_coordinates(coordinates)
+
+# Вывод отфильтрованных координат
+print("Отфильтрованные координаты:")
+for coord in filtered_coordinates:
+    print(coord)

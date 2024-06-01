@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Удаляем все изображения из папки attachments
+rm -f attachments/image_*.jpg
+
+echo "All images have been deleted from the attachments directory."

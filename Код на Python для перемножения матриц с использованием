@@ -1,0 +1,56 @@
+import numpy as np
+from multiprocessing import Process, Array
+
+def matrix_multiply_worker(A, B, result, start_row, end_row, n, m, p):
+    # Перемножение части матрицы A на матрицу B и сохранение результата в общей памяти
+    for i in range(start_row, end_row):
+        for j in range(p):
+            result[i * p + j] = sum(A[i * m + k] * B[k * p + j] for k in range(m))
+
+def parallel_matrix_multiply(A, B, num_processes):
+    n, m = A.shape
+    m2, p = B.shape
+    if m != m2:
+        raise ValueError("Количество столбцов A должно быть равно количеству строк B")
+    
+    # Преобразуем матрицы в одномерные массивы для передачи в процессы
+    A_1d = A.flatten()
+    B_1d = B.flatten()
+    result = Array('d', n * p)  # Общая память для хранения результата
+
+    # Определяем диапазон строк для каждого процесса
+    rows_per_process = n // num_processes
+    processes = []
+
+    for i in range(num_processes):
+        start_row = i * rows_per_process
+        if i == num_processes - 1:
+            end_row = n
+        else:
+            end_row = (i + 1) * rows_per_process
+
+        process = Process(target=matrix_multiply_worker, args=(A_1d, B_1d, result, start_row, end_row, n, m, p))
+        processes.append(process)
+        process.start()
+
+    for process in processes:
+        process.join()
+
+    # Преобразуем одномерный массив результата обратно в двумерную матрицу
+    result_matrix = np.array(result[:]).reshape((n, p))
+    return result_matrix
+
+# Пример использования
+if __name__ == "__main__":
+    A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    B = np.array([[9, 8, 7], [6, 5, 4], [3, 2, 1]])
+
+    num_processes = 3
+    result = parallel_matrix_multiply(A, B, num_processes)
+
+    print("Матрица A:")
+    print(A)
+    print("Матрица B:")
+    print(B)
+    print("Результат перемножения A и B:")
+    print(result)

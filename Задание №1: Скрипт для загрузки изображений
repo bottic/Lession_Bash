@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Создаем директорию attachments, если она не существует
+mkdir -p attachments
+
+# Загрузка 20 изображений
+for i in {1..20}
+do
+  # Загружаем изображение и сохраняем его в папку attachments с именем image_i.jpg
+  curl https://picsum.photos/800/400 -L > attachments/image_$i.jpg
+done
+
+echo "20 images have been downloaded to the attachments directory."
